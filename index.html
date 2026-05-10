@@ -1,771 +1,243 @@
+```html id="r4s53x"
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+/>
 
 <title>أنا وأنت</title>
 
+<meta
+    name="description"
+    content="لعبة اجتماعية مضحكة لشخصين على نفس الجوال 😂"
+/>
+
 <meta name="theme-color" content="#111827">
 
-<meta name="description" content="لعبة اجتماعية مضحكة لشخصين على نفس الجوال. اكتشفوا مدى توافقكم… أو بداية انهيار صداقتكم 😂">
-
 <meta property="og:title" content="أنا وأنت">
-<meta property="og:description" content="لعبة اجتماعية مضحكة لشخصين على نفس الجوال. اكتشفوا مدى توافقكم… أو بداية انهيار صداقتكم 😂">
+<meta
+    property="og:description"
+    content="اكتشفوا مدى توافقكم… أو بداية انهيار صداقتكم 😂"
+/>
+
 <meta property="og:type" content="website">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="أنا وأنت">
-<meta name="twitter:description" content="لعبة اجتماعية مضحكة لشخصين على نفس الجوال 😂">
-
-<link rel="icon" href="data:image/svg+xml,
-<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22>
-<rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23111827%22/>
-<text y=%22.9em%22 x=%2250%22 text-anchor=%22middle%22 font-size=%2280%22>😂</text>
-</svg>">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
+
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link
+    href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;700;800&display=swap"
+    rel="stylesheet"
+/>
 
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
 
 <style>
 
 :root{
-    --bg1:#0f1020;
-    --bg2:#1b1f3a;
+    --bg:#0f1020;
+    --bg2:#1d2140;
 
-    --accent1:#ff4d8d;
+    --accent:#ff4d8d;
     --accent2:#7c5cff;
     --accent3:#00d4ff;
 
     --success:#00e676;
     --danger:#ff5252;
 
-    --text:#ffffff;
-    --muted:#d0d0e2;
+    --white:#ffffff;
+    --muted:#c8c8d8;
 }
 
 {
     box-sizing:border-box;
+    margin:0;
+    padding:0;
     -webkit-tap-highlight-color:transparent;
 }
 
+html,
 body{
-    margin:0;
+    width:100%;
+    height:100%;
     overflow:hidden;
-    background:#0f1020;
+    background:var(--bg);
     font-family:'Alexandria',sans-serif;
-    color:white;
+}
+
+#game{
+    width:100%;
+    height:100%;
 }
 
 canvas{
     display:block;
 }
 
-#game{
-    width:100vw;
-    height:100vh;
-}
-
-.glass{
-    backdrop-filter:blur(12px);
-}
-
 </style>
+
 </head>
+
 <body>
 
 <div id="game"></div>
 
 <script>
 
-const defaultPack = {
-    packName:"الحزمة الأساسية",
-    language:"ar",
-    questions:[
-        {
-            id:1,
-            question:"مين فيكم ممكن يضيع في المول لمدة ساعتين؟",
-            options:["أنا","أنت","إحنا الاثنين","ولا واحد"],
-            category:"funny",
-            chaosLevel:4,
-            funnyCommentMatch:"واضح إنكم تعرفوا بعض مرة 😂",
-            funnyCommentMismatch:"حتى الضياع مختلفين فيه 💀"
-        },
-        {
-            id:2,
-            question:"مين غالبًا يرد بعد 8 ساعات؟",
-            options:["أنا","أنت","على حسب المزاج","ما نرد أصلًا"],
-            category:"chaos",
-            chaosLevel:7,
-            funnyCommentMatch:"فيه اتفاق مخيف هنا 👀",
-            funnyCommentMismatch:"بدأت الحقائق تظهر 😂"
-        },
-        {
-            id:3,
-            question:"لو صار زومبي أبكوليبس… مين أول واحد ينهار؟",
-            options:["أنا","أنت","إحنا بنهرب","نصير زومبي"],
-            category:"chaos",
-            chaosLevel:9,
-            funnyCommentMatch:"واضح إن الخطة جاهزة 😂",
-            funnyCommentMismatch:"واضح إن محد واثق في الثاني 💀"
-        },
-        {
-            id:4,
-            question:"مين فيكم يخفي حزنه أكثر؟",
-            options:["أنا","أنت","إحنا الاثنين","ولا أحد"],
-            category:"emotional",
-            chaosLevel:5,
-            funnyCommentMatch:"واضح فيه فهم عاطفي هنا 🤍",
-            funnyCommentMismatch:"فيه مشاعر غير مفهومة هنا 👀"
-        },
-        {
-            id:5,
-            question:"مين ممكن يقرأ محادثات الثاني لو سنحت الفرصة؟",
-            options:["أنا","أنت","أكيد الاثنين","مستحيل"],
-            category:"betrayal",
-            chaosLevel:10,
-            funnyCommentMatch:"الثقة انهارت رسميًا 😂",
-            funnyCommentMismatch:"فيه شخص قاعد يمثل البراءة 👀"
-        }
-    ]
-};
+/ =====================================================
+    GLOBAL DATA
+===================================================== /
 
-const memory = {
-    matches:0,
-    mismatches:0,
-    hesitation:0
-};
+const GAME_STATE = {
 
-const state = {
     players:[
-        {name:"",emoji:"😎"},
-        {name:"",emoji:"😂"}
+        {
+            name:"",
+            emoji:"😎"
+        },
+        {
+            name:"",
+            emoji:"😂"
+        }
     ],
-    currentQuestion:null,
-    player1Answer:null,
-    player2Answer:null,
+
+    currentQuestionIndex:0,
+
     currentPlayer:0,
-    questions:[...defaultPack.questions]
+
+    playerAnswers:[null,null],
+
+    stats:{
+        matches:0,
+        mismatches:0
+    }
+
 };
 
-class MainMenu extends Phaser.Scene{
+const QUESTION_PACK = [
 
-    constructor(){
-        super("MainMenu");
+    {
+        question:"مين فيكم ممكن يختفي يوم كامل بدون سبب؟",
+        options:[
+            "أنا",
+            "أنت",
+            "إحنا الاثنين",
+            "ولا أحد"
+        ],
+        match:"واضح إنكم حافظين بعض 😂",
+        mismatch:"بدأت الفضايح تطلع 👀"
+    },
+
+    {
+        question:"مين غالبًا يرد بعد 7 ساعات؟",
+        options:[
+            "أنا",
+            "أنت",
+            "حسب المزاج",
+            "ما نرد أصلًا"
+        ],
+        match:"واضح إن نفس العقلية موجودة 💀",
+        mismatch:"فيه شخص يكذب هنا 😂"
+    },
+
+    {
+        question:"لو صارت نهاية العالم… مين أول واحد ينهار؟",
+        options:[
+            "أنا",
+            "أنت",
+            "إحنا بننجو",
+            "نصير زومبي"
+        ],
+        match:"واضح إن الخطة جاهزة 😂",
+        mismatch:"الثقة بدأت تنهار 💀"
+    },
+
+    {
+        question:"مين ممكن يفتح جوال الثاني لو سنحت الفرصة؟",
+        options:[
+            "أنا",
+            "أنت",
+            "إحنا الاثنين",
+            "مستحيل"
+        ],
+        match:"الثقة انتهت رسميًا 😂",
+        mismatch:"فيه تمثيل براءة هنا 👀"
+    },
+
+    {
+        question:"مين أكثر شخص يسوي دراما؟",
+        options:[
+            "أنا",
+            "أنت",
+            "إحنا الاثنين",
+            "ولا أحد"
+        ],
+        match:"واضح إنكم صريحين جدًا 😂",
+        mismatch:"فيه إنكار واضح هنا 💀"
     }
 
-    create(){
+];
 
-        this.createBackground();
+/ =====================================================
+    AUDIO
+===================================================== /
 
-        const centerX = this.cameras.main.width/2;
+let audioCtx = null;
 
-        const title = this.add.text(centerX,120,"أنا وأنت",{
-            fontFamily:"Alexandria",
-            fontSize:"56px",
-            color:"#ffffff",
-            fontStyle:"700"
-        }).setOrigin(0.5);
+function initAudio(){
 
-        this.tweens.add({
-            targets:title,
-            scale:1.05,
-            duration:1200,
-            yoyo:true,
-            repeat:-1
-        });
+    if(!audioCtx){
 
-        const subtitle = this.add.text(centerX,190,"لعبة تصنع لحظات لا تُنسى",{
-            fontFamily:"Alexandria",
-            fontSize:"20px",
-            color:"#c7c9d3"
-        }).setOrigin(0.5);
-
-        const buttons = [
-            {text:"ابدأ اللعبة", y:320, action:()=>this.scene.start("PlayerSetup")},
-            {text:"الإعدادات", y:410, action:()=>this.scene.start("Settings")},
-            {text:"مشاركة اللعبة", y:500, action:()=>shareGame()},
-            {text:"تكبير الشاشة", y:590, action:()=>toggleFullscreen()}
-        ];
-
-        buttons.forEach(btn=>{
-            this.createButton(centerX,btn.y,btn.text,btn.action);
-        });
-
-        const dev = this.add.text(centerX,this.cameras.main.height-40,"برمجة محمد جبلي",{
-            fontFamily:"Alexandria",
-            fontSize:"16px",
-            color:"#00d4ff"
-        })
-        .setOrigin(0.5)
-        .setInteractive({useHandCursor:true});
-
-        dev.on("pointerdown",()=>{
-            window.open("https://wa.me/966505501575","_blank");
-        });
-
-    }
-
-    createBackground(){
-
-        const g = this.add.graphics();
-
-        g.fillGradientStyle(0x0f1020,0x1b1f3a,0x1b1f3a,0x0f1020,1);
-        g.fillRect(0,0,this.cameras.main.width,this.cameras.main.height);
-
-        for(let i=0;i<25;i++){
-
-            const circle = this.add.circle(
-                Phaser.Math.Between(0,window.innerWidth),
-                Phaser.Math.Between(0,window.innerHeight),
-                Phaser.Math.Between(20,80),
-                Phaser.Display.Color.RandomRGB().color,
-                0.08
-            );
-
-            this.tweens.add({
-                targets:circle,
-                y:circle.y-40,
-                duration:Phaser.Math.Between(3000,6000),
-                yoyo:true,
-                repeat:-1
-            });
-        }
-
-    }
-
-    createButton(x,y,text,callback){
-
-        const container = this.add.container(x,y);
-
-        const bg = this.add.rectangle(0,0,320,72,0xffffff,0.08)
-        .setStrokeStyle(2,0xffffff,0.2)
-        .setOrigin(0.5);
-
-        const label = this.add.text(0,0,text,{
-            fontFamily:"Alexandria",
-            fontSize:"24px",
-            color:"#ffffff"
-        }).setOrigin(0.5);
-
-        container.add([bg,label]);
-
-        bg.setInteractive({useHandCursor:true});
-
-        bg.on("pointerdown",()=>{
-
-            vibrate(40);
-
-            this.tweens.add({
-                targets:container,
-                scale:0.95,
-                duration:80,
-                yoyo:true
-            });
-
-            playBeep(200,0.05);
-
-            callback();
-        });
+        audioCtx = new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
 
     }
 
 }
 
-class PlayerSetup extends Phaser.Scene{
+function beep(freq = 220, duration = 0.08){
 
-    constructor(){
-        super("PlayerSetup");
-    }
+    initAudio();
 
-    create(){
+    const osc = audioCtx.createOscillator();
 
-        this.createBackground();
-
-        const centerX = this.cameras.main.width/2;
-
-        this.add.text(centerX,100,"أدخلوا أسماءكم",{
-            fontFamily:"Alexandria",
-            fontSize:"36px",
-            color:"#fff"
-        }).setOrigin(0.5);
-
-        const input1 = this.createHTMLInput(centerX,250,"اسم اللاعب الأول");
-        const input2 = this.createHTMLInput(centerX,360,"اسم اللاعب الثاني");
-
-        this.createButton(centerX,520,"ابدأ",()=>{
-
-            state.players[0].name = input1.value || "اللاعب الأول";
-            state.players[1].name = input2.value || "اللاعب الثاني";
-
-            this.scene.start("QuestionScene");
-        });
-
-    }
-
-    createBackground(){
-
-        const g = this.add.graphics();
-
-        g.fillGradientStyle(0x0f1020,0x1b1f3a,0x1b1f3a,0x0f1020,1);
-        g.fillRect(0,0,this.cameras.main.width,this.cameras.main.height);
-
-    }
-
-    createHTMLInput(x,y,placeholder){
-
-        const input = document.createElement("input");
-
-        input.placeholder = placeholder;
-
-        Object.assign(input.style,{
-            position:"absolute",
-            left:"50%",
-            top:y+"px",
-            transform:"translateX(-50%)",
-            width:"80%",
-            maxWidth:"340px",
-            height:"60px",
-            borderRadius:"18px",
-            border:"2px solid rgba(255,255,255,0.15)",
-            background:"rgba(255,255,255,0.08)",
-            color:"white",
-            fontFamily:"Alexandria",
-            fontSize:"20px",
-            padding:"0 20px",
-            outline:"none",
-            textAlign:"center",
-            backdropFilter:"blur(10px)"
-        });
-
-        document.body.appendChild(input);
-
-        this.events.on("shutdown",()=>{
-            input.remove();
-        });
-
-        return input;
-
-    }
-
-    createButton(x,y,text,callback){
-
-        const bg = this.add.rectangle(x,y,260,70,0xff4d8d)
-        .setInteractive({useHandCursor:true});
-
-        bg.setRadius(24);
-
-        const label = this.add.text(x,y,text,{
-            fontFamily:"Alexandria",
-            fontSize:"28px",
-            color:"#fff"
-        }).setOrigin(0.5);
-
-        bg.on("pointerdown",()=>{
-
-            vibrate(50);
-
-            playBeep(250,0.05);
-
-            callback();
-        });
-
-    }
-
-}
-
-class QuestionScene extends Phaser.Scene{
-
-    constructor(){
-        super("QuestionScene");
-    }
-
-    create(){
-
-        this.createBackground();
-
-        this.question = Phaser.Utils.Array.GetRandom(state.questions);
-
-        state.currentQuestion = this.question;
-
-        this.renderQuestion();
-
-    }
-
-    createBackground(){
-
-        const g = this.add.graphics();
-
-        g.fillGradientStyle(0x0f1020,0x1b1f3a,0x1b1f3a,0x0f1020,1);
-        g.fillRect(0,0,this.cameras.main.width,this.cameras.main.height);
-
-    }
-
-    renderQuestion(){
-
-        const centerX = this.cameras.main.width/2;
-
-        const currentPlayer = state.currentPlayer;
-
-        const player = state.players[currentPlayer];
-
-        this.add.text(centerX,70,
-            "دور "+player.name+" "+player.emoji,{
-            fontFamily:"Alexandria",
-            fontSize:"30px",
-            color:"#fff"
-        }).setOrigin(0.5);
-
-        const timerText = this.add.text(centerX,130,"5",{
-            fontFamily:"Alexandria",
-            fontSize:"48px",
-            color:"#ff4d8d"
-        }).setOrigin(0.5);
-
-        let time = 5;
-
-        const timer = this.time.addEvent({
-            delay:1000,
-            loop:true,
-            callback:()=>{
-
-                time--;
-
-                timerText.setText(time);
-
-                playBeep(400,0.03);
-
-                if(time<=0){
-                    timer.remove(false);
-                }
-            }
-        });
-
-        const card = this.add.rectangle(centerX,250,340,150,0xffffff,0.08)
-        .setStrokeStyle(2,0xffffff,0.15);
-
-        card.setRadius(24);
-
-        this.add.text(centerX,250,this.question.question,{
-            fontFamily:"Alexandria",
-            fontSize:"24px",
-            color:"#fff",
-            align:"center",
-            wordWrap:{width:300}
-        }).setOrigin(0.5);
-
-        this.question.options.forEach((opt,index)=>{
-
-            const y = 390 + index90;
-
-            const btn = this.add.rectangle(centerX,y,320,68,0xffffff,0.08)
-            .setStrokeStyle(2,0xffffff,0.15)
-            .setInteractive({useHandCursor:true});
-
-            btn.setRadius(20);
-
-            const text = this.add.text(centerX,y,opt,{
-                fontFamily:"Alexandria",
-                fontSize:"22px",
-                color:"#fff"
-            }).setOrigin(0.5);
-
-            btn.on("pointerdown",()=>{
-
-                vibrate(80);
-
-                playBeep(180,0.08);
-
-                this.cameras.main.shake(120,0.002);
-
-                if(currentPlayer===0){
-
-                    state.player1Answer = opt;
-                    state.currentPlayer = 1;
-
-                    this.scene.restart();
-
-                }else{
-
-                    state.player2Answer = opt;
-                    state.currentPlayer = 0;
-
-                    this.scene.start("RevealScene");
-
-                }
-
-            });
-
-        });
-
-    }
-
-}
-
-class RevealScene extends Phaser.Scene{
-
-    constructor(){
-        super("RevealScene");
-    }
-
-    create(){
-
-        this.createBackground();
-
-        const q = state.currentQuestion;
-
-        const centerX = this.cameras.main.width/2;
-
-        const match = state.player1Answer === state.player2Answer;
-
-        this.add.text(centerX,90,"النتيجة",{
-            fontFamily:"Alexandria",
-            fontSize:"44px",
-            color:"#fff"
-        }).setOrigin(0.5);
-
-        const answer1 = this.add.text(centerX,250,
-            state.players[0].name+" اختار:\n"+state.player1Answer,{
-            fontFamily:"Alexandria",
-            fontSize:"24px",
-            align:"center",
-            color:"#fff"
-        }).setOrigin(0.5);
-
-        const answer2 = this.add.text(centerX,420,
-            state.players[1].name+" اختار:\n"+state.player2Answer,{
-            fontFamily:"Alexandria",
-            fontSize:"24px",
-            align:"center",
-            color:"#fff"
-        }).setOrigin(0.5);
-
-        if(match){
-
-            memory.matches++;
-
-            this.cameras.main.shake(400,0.005);
-
-            this.add.particles(0,0,'',{
-
-            });
-
-            playBeep(600,0.15);
-
-            this.add.text(centerX,560,"🎉 "+q.funnyCommentMatch,{
-                fontFamily:"Alexandria",
-                fontSize:"26px",
-                color:"#00e676",
-                align:"center",
-                wordWrap:{width:340}
-            }).setOrigin(0.5);
-
-        }else{
-
-            memory.mismatches++;
-
-            playBeep(120,0.2);
-
-            this.cameras.main.flash(300,255,0,0);
-
-            this.add.text(centerX,560,"💀 "+q.funnyCommentMismatch,{
-                fontFamily:"Alexandria",
-                fontSize:"26px",
-                color:"#ff5252",
-                align:"center",
-                wordWrap:{width:340}
-            }).setOrigin(0.5);
-
-        }
-
-        this.add.text(centerX,650,
-            dynamicComment(),{
-            fontFamily:"Alexandria",
-            fontSize:"18px",
-            color:"#c7c9d3",
-            align:"center",
-            wordWrap:{width:320}
-        }).setOrigin(0.5);
-
-        this.createButton(centerX,760,"السؤال التالي",()=>{
-
-            state.player1Answer = null;
-            state.player2Answer = null;
-
-            this.scene.start("QuestionScene");
-        });
-
-    }
-
-    createBackground(){
-
-        const g = this.add.graphics();
-
-        g.fillGradientStyle(0x0f1020,0x1b1f3a,0x1b1f3a,0x0f1020,1);
-        g.fillRect(0,0,this.cameras.main.width,this.cameras.main.height);
-
-    }
-
-    createButton(x,y,text,callback){
-
-        const bg = this.add.rectangle(x,y,300,70,0x7c5cff)
-        .setInteractive({useHandCursor:true});
-
-        bg.setRadius(22);
-
-        const label = this.add.text(x,y,text,{
-            fontFamily:"Alexandria",
-            fontSize:"24px",
-            color:"#fff"
-        }).setOrigin(0.5);
-
-        bg.on("pointerdown",()=>{
-
-            vibrate(50);
-
-            playBeep(250,0.05);
-
-            callback();
-        });
-
-    }
-
-}
-
-class Settings extends Phaser.Scene{
-
-    constructor(){
-        super("Settings");
-    }
-
-    create(){
-
-        this.createBackground();
-
-        const centerX = this.cameras.main.width/2;
-
-        this.add.text(centerX,100,"إدارة الأسئلة",{
-            fontFamily:"Alexandria",
-            fontSize:"36px",
-            color:"#fff"
-        }).setOrigin(0.5);
-
-        const buttons = [
-            {
-                text:"انسخ الـ Prompt",
-                y:250,
-                action:()=>copyPrompt()
-            },
-            {
-                text:"لصق الأسئلة JSON",
-                y:360,
-                action:()=>pasteJSON()
-            },
-            {
-                text:"حذف جميع الأسئلة",
-                y:470,
-                action:()=>{
-                    localStorage.removeItem("customQuestions");
-                    alert("تم حذف الأسئلة");
-                }
-            },
-            {
-                text:"تحميل مثال جاهز",
-                y:580,
-                action:()=>{
-                    localStorage.setItem("customQuestions",JSON.stringify(defaultPack));
-                    alert("تم تحميل المثال");
-                }
-            }
-        ];
-
-        buttons.forEach(btn=>{
-            this.createButton(centerX,btn.y,btn.text,btn.action);
-        });
-
-        this.createButton(centerX,730,"رجوع",()=>{
-            this.scene.start("MainMenu");
-        });
-
-    }
-
-    createBackground(){
-
-        const g = this.add.graphics();
-
-        g.fillGradientStyle(0x0f1020,0x1b1f3a,0x1b1f3a,0x0f1020,1);
-        g.fillRect(0,0,this.cameras.main.width,this.cameras.main.height);
-
-    }
-
-    createButton(x,y,text,callback){
-
-        const bg = this.add.rectangle(x,y,320,72,0xffffff,0.08)
-        .setStrokeStyle(2,0xffffff,0.2)
-        .setInteractive({useHandCursor:true});
-
-        bg.setRadius(24);
-
-        const label = this.add.text(x,y,text,{
-            fontFamily:"Alexandria",
-            fontSize:"24px",
-            color:"#fff"
-        }).setOrigin(0.5);
-
-        bg.on("pointerdown",()=>{
-
-            vibrate(50);
-
-            playBeep(240,0.05);
-
-            callback();
-        });
-
-    }
-
-}
-
-function dynamicComment(){
-
-    if(memory.matches > memory.mismatches){
-        return "واضح إنكم تفكروا بنفس الطريقة 😂";
-    }
-
-    if(memory.mismatches > memory.matches){
-        return "واضح إن الثقة بدأت تنهار 💀";
-    }
-
-    return "العلاقة ما زالت تحت الاختبار 👀";
-}
-
-function playBeep(freq,duration){
-
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-
-    const osc = ctx.createOscillator();
-
-    const gain = ctx.createGain();
+    const gain = audioCtx.createGain();
 
     osc.frequency.value = freq;
 
+    osc.type = "sine";
+
     osc.connect(gain);
 
-    gain.connect(ctx.destination);
+    gain.connect(audioCtx.destination);
+
+    gain.gain.value = 0.03;
 
     osc.start();
 
     gain.gain.exponentialRampToValueAtTime(
-        0.00001,
-        ctx.currentTime + duration
+        0.0001,
+        audioCtx.currentTime + duration
     );
 
-    osc.stop(ctx.currentTime + duration);
+    osc.stop(audioCtx.currentTime + duration);
 
 }
+
+/ =====================================================
+    HELPERS
+===================================================== /
 
 function vibrate(ms){
 
@@ -775,12 +247,30 @@ function vibrate(ms){
 
 }
 
+function fullscreen(){
+
+    if(!document.fullscreenElement){
+
+        document.documentElement.requestFullscreen();
+
+    }else{
+
+        document.exitFullscreen();
+
+    }
+
+}
+
 async function shareGame(){
 
     const data = {
+
         title:"أنا وأنت",
-        text:"لعبة اجتماعية مضحكة لشخصين على نفس الجوال 😂",
+
+        text:"لعبة اجتماعية مضحكة لشخصين 😂",
+
         url:location.href
+
     };
 
     if(navigator.share){
@@ -793,57 +283,839 @@ async function shareGame(){
 
         navigator.clipboard.writeText(location.href);
 
-        alert("تم نسخ رابط اللعبة");
+        alert("تم نسخ الرابط");
+
     }
 
 }
 
-function toggleFullscreen(){
+/ =====================================================
+    UI HELPERS
+===================================================== /
 
-    if(!document.fullscreenElement){
-        document.documentElement.requestFullscreen();
-    }else{
-        document.exitFullscreen();
+function createButton(
+    scene,
+    x,
+    y,
+    width,
+    height,
+    text,
+    color,
+    callback
+){
+
+    const container = scene.add.container(x,y);
+
+    const bg = scene.add.rectangle(
+        0,
+        0,
+        width,
+        height,
+        color,
+        1
+    );
+
+    bg.setStrokeStyle(
+        2,
+        0xffffff,
+        0.12
+    );
+
+    bg.setRadius(24);
+
+    const label = scene.add.text(
+        0,
+        0,
+        text,
+        {
+            fontFamily:"Alexandria",
+            fontSize:"28px",
+            color:"#ffffff"
+        }
+    )
+    .setOrigin(0.5);
+
+    container.add([bg,label]);
+
+    bg.setInteractive({useHandCursor:true});
+
+    bg.on("pointerdown",()=>{
+
+        beep(260);
+
+        vibrate(40);
+
+        scene.tweens.add({
+
+            targets:container,
+
+            scale:0.93,
+
+            duration:80,
+
+            yoyo:true
+
+        });
+
+        callback();
+
+    });
+
+    return container;
+
+}
+
+function createBackground(scene){
+
+    const width = scene.scale.width;
+    const height = scene.scale.height;
+
+    const graphics = scene.add.graphics();
+
+    graphics.fillGradientStyle(
+        0x0f1020,
+        0x1d2140,
+        0x1d2140,
+        0x0f1020,
+        1
+    );
+
+    graphics.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    for(let i=0;i<16;i++){
+
+        const circle = scene.add.circle(
+            Phaser.Math.Between(0,width),
+            Phaser.Math.Between(0,height),
+            Phaser.Math.Between(20,90),
+            Phaser.Display.Color.RandomRGB().color,
+            0.08
+        );
+
+        scene.tweens.add({
+
+            targets:circle,
+
+            y:circle.y - 40,
+
+            duration:Phaser.Math.Between(3000,7000),
+
+            yoyo:true,
+
+            repeat:-1
+
+        });
+
     }
 
 }
 
-function copyPrompt(){
+/ =====================================================
+    SCENES
+===================================================== /
 
-    const prompt = Generate Arabic social party game questions in JSON format.  Requirements: - Funny - Emotional - Chaotic - Meme-worthy - 4 answer options - Arabic only - Short readable text  JSON format: {  "packName":"",  "language":"ar",  "questions":[] };
+class MainMenu extends Phaser.Scene{
 
-    navigator.clipboard.writeText(prompt);
+    constructor(){
 
-    alert("تم نسخ الـ Prompt");
+        super("MainMenu");
+
+    }
+
+    create(){
+
+        createBackground(this);
+
+        const centerX = this.scale.width / 2;
+
+        const title = this.add.text(
+
+            centerX,
+
+            140,
+
+            "أنا وأنت",
+
+            {
+                fontFamily:"Alexandria",
+                fontSize:"64px",
+                color:"#ffffff",
+                fontStyle:"700"
+            }
+
+        ).setOrigin(0.5);
+
+        this.tweens.add({
+
+            targets:title,
+
+            scale:1.04,
+
+            duration:1200,
+
+            yoyo:true,
+
+            repeat:-1
+
+        });
+
+        this.add.text(
+
+            centerX,
+
+            210,
+
+            "لعبة تصنع لحظات لا تُنسى",
+
+            {
+                fontFamily:"Alexandria",
+                fontSize:"22px",
+                color:"#c8c8d8"
+            }
+
+        ).setOrigin(0.5);
+
+        createButton(
+            this,
+            centerX,
+            350,
+            320,
+            80,
+            "ابدأ اللعبة",
+            0xff4d8d,
+            ()=>{
+
+                this.scene.start("PlayerSetup");
+
+            }
+        );
+
+        createButton(
+            this,
+            centerX,
+            460,
+            320,
+            80,
+            "مشاركة اللعبة",
+            0x7c5cff,
+            ()=>{
+
+                shareGame();
+
+            }
+        );
+
+        createButton(
+            this,
+            centerX,
+            570,
+            320,
+            80,
+            "تكبير الشاشة",
+            0x00d4ff,
+            ()=>{
+
+                fullscreen();
+
+            }
+        );
+
+        const dev = this.add.text(
+
+            centerX,
+
+            this.scale.height - 40,
+
+            "برمجة محمد جبلي",
+
+            {
+                fontFamily:"Alexandria",
+                fontSize:"18px",
+                color:"#00d4ff"
+            }
+
+        )
+        .setOrigin(0.5)
+        .setInteractive({useHandCursor:true});
+
+        dev.on("pointerdown",()=>{
+
+            window.open(
+                "https://wa.me/966505501575",
+                "_blank"
+            );
+
+        });
+
+    }
+
 }
 
-function pasteJSON(){
+class PlayerSetup extends Phaser.Scene{
 
-    const raw = prompt("الصق JSON هنا");
+    constructor(){
 
-    if(!raw) return;
+        super("PlayerSetup");
 
-    try{
+    }
 
-        const parsed = JSON.parse(raw);
+    create(){
 
-        if(!parsed.questions){
-            throw new Error();
+        createBackground(this);
+
+        const centerX = this.scale.width / 2;
+
+        this.add.text(
+
+            centerX,
+
+            120,
+
+            "أدخلوا أسماءكم",
+
+            {
+                fontFamily:"Alexandria",
+                fontSize:"42px",
+                color:"#ffffff"
+            }
+
+        ).setOrigin(0.5);
+
+        const input1 = this.createInput(
+            250,
+            "اسم اللاعب الأول"
+        );
+
+        const input2 = this.createInput(
+            370,
+            "اسم اللاعب الثاني"
+        );
+
+        createButton(
+            this,
+            centerX,
+            560,
+            280,
+            80,
+            "ابدأ",
+            0xff4d8d,
+            ()=>{
+
+                GAME_STATE.players[0].name =
+                    input1.value || "اللاعب الأول";
+
+                GAME_STATE.players[1].name =
+                    input2.value || "اللاعب الثاني";
+
+                input1.remove();
+                input2.remove();
+
+                this.scene.start("QuestionScene");
+
+            }
+        );
+
+    }
+
+    createInput(top,placeholder){
+
+        const input = document.createElement("input");
+
+        input.placeholder = placeholder;
+
+        Object.assign(input.style,{
+
+            position:"absolute",
+
+            left:"50%",
+
+            top:top+"px",
+
+            transform:"translateX(-50%)",
+
+            width:"80%",
+
+            maxWidth:"340px",
+
+            height:"64px",
+
+            borderRadius:"22px",
+
+            border:"2px solid rgba(255,255,255,0.1)",
+
+            background:"rgba(255,255,255,0.08)",
+
+            color:"#ffffff",
+
+            fontFamily:"Alexandria",
+
+            fontSize:"22px",
+
+            padding:"0 20px",
+
+            outline:"none",
+
+            textAlign:"center",
+
+            backdropFilter:"blur(10px)"
+
+        });
+
+        document.body.appendChild(input);
+
+        return input;
+
+    }
+
+}
+
+class QuestionScene extends Phaser.Scene{
+
+    constructor(){
+
+        super("QuestionScene");
+
+    }
+
+    create(){
+
+        createBackground(this);
+
+        const centerX = this.scale.width / 2;
+
+        const currentQuestion =
+            QUESTION_PACK[GAME_STATE.currentQuestionIndex];
+
+        const player =
+            GAME_STATE.players[GAME_STATE.currentPlayer];
+
+        this.add.text(
+
+            centerX,
+
+            90,
+
+            "دور " + player.name + " " + player.emoji,
+
+            {
+                fontFamily:"Alexandria",
+                fontSize:"34px",
+                color:"#ffffff"
+            }
+
+        ).setOrigin(0.5);
+
+        const timerText = this.add.text(
+
+            centerX,
+
+            160,
+
+            "5",
+
+            {
+                fontFamily:"Alexandria",
+                fontSize:"58px",
+                color:"#ff4d8d"
+            }
+
+        ).setOrigin(0.5);
+
+        let count = 5;
+
+        this.time.addEvent({
+
+            delay:1000,
+
+            repeat:4,
+
+            callback:()=>{
+
+                count--;
+
+                timerText.setText(count);
+
+                beep(500,0.03);
+
+            }
+
+        });
+
+        const card = this.add.rectangle(
+
+            centerX,
+
+            310,
+
+            350,
+
+            180,
+
+            0xffffff,
+
+            0.08
+
+        );
+
+        card.setRadius(26);
+
+        card.setStrokeStyle(
+            2,
+            0xffffff,
+            0.1
+        );
+
+        this.add.text(
+
+            centerX,
+
+            310,
+
+            currentQuestion.question,
+
+            {
+                fontFamily:"Alexandria",
+                fontSize:"28px",
+                color:"#ffffff",
+                align:"center",
+                wordWrap:{
+                    width:300
+                }
+            }
+
+        ).setOrigin(0.5);
+
+        currentQuestion.options.forEach((option,index)=>{
+
+            const y = 480 + (index * 90);
+
+            const button = createButton(
+
+                this,
+
+                centerX,
+
+                y,
+
+                320,
+
+                70,
+
+                option,
+
+                0xffffff,
+
+                ()=>{
+
+                    this.answer(option);
+
+                }
+
+            );
+
+            button.first.fillColor = 0xffffff;
+            button.first.fillAlpha = 0.08;
+
+        });
+
+    }
+
+    answer(option){
+
+        const playerIndex = GAME_STATE.currentPlayer;
+
+        GAME_STATE.playerAnswers[playerIndex] = option;
+
+        this.cameras.main.shake(160,0.004);
+
+        beep(180,0.1);
+
+        if(playerIndex === 0){
+
+            GAME_STATE.currentPlayer = 1;
+
+            this.scene.restart();
+
+        }else{
+
+            GAME_STATE.currentPlayer = 0;
+
+            this.scene.start("RevealScene");
+
         }
 
-        localStorage.setItem("customQuestions",raw);
+    }
 
-        state.questions = parsed.questions;
+}
 
-        alert("تم حفظ الأسئلة");
+class RevealScene extends Phaser.Scene{
 
-    }catch(e){
+    constructor(){
 
-        alert("JSON غير صالح");
+        super("RevealScene");
+
+    }
+
+    create(){
+
+        createBackground(this);
+
+        const centerX = this.scale.width / 2;
+
+        const currentQuestion =
+            QUESTION_PACK[GAME_STATE.currentQuestionIndex];
+
+        const answer1 =
+            GAME_STATE.playerAnswers[0];
+
+        const answer2 =
+            GAME_STATE.playerAnswers[1];
+
+        const match = answer1 === answer2;
+
+        this.add.text(
+
+            centerX,
+
+            100,
+
+            match ? "🎉 تطابق!" : "💀 اختلاف!",
+
+            {
+                fontFamily:"Alexandria",
+                fontSize:"52px",
+                color:match ? "#00e676" : "#ff5252"
+            }
+
+        ).setOrigin(0.5);
+
+        this.add.text(
+
+            centerX,
+
+            260,
+
+            GAME_STATE.players[0].name +
+            "\nاختار:\n" +
+            answer1,
+
+            {
+                fontFamily:"Alexandria",
+                fontSize:"28px",
+                color:"#ffffff",
+                align:"center"
+            }
+
+        ).setOrigin(0.5);
+
+        this.add.text(
+
+            centerX,
+
+            470,
+
+            GAME_STATE.players[1].name +
+            "\nاختار:\n" +
+            answer2,
+
+            {
+                fontFamily:"Alexandria",
+                fontSize:"28px",
+                color:"#ffffff",
+                align:"center"
+            }
+
+        ).setOrigin(0.5);
+
+        if(match){
+
+            GAME_STATE.stats.matches++;
+
+            this.cameras.main.shake(400,0.005);
+
+            beep(640,0.15);
+
+            this.add.text(
+
+                centerX,
+
+                620,
+
+                currentQuestion.match,
+
+                {
+                    fontFamily:"Alexandria",
+                    fontSize:"30px",
+                    color:"#00e676",
+                    align:"center",
+                    wordWrap:{
+                        width:320
+                    }
+                }
+
+            ).setOrigin(0.5);
+
+            for(let i=0;i<18;i++){
+
+                const confetti = this.add.circle(
+
+                    Phaser.Math.Between(0,this.scale.width),
+
+                    -20,
+
+                    Phaser.Math.Between(4,10),
+
+                    Phaser.Display.Color.RandomRGB().color
+
+                );
+
+                this.tweens.add({
+
+                    targets:confetti,
+
+                    y:this.scale.height + 50,
+
+                    x:confetti.x +
+                      Phaser.Math.Between(-100,100),
+
+                    angle:360,
+
+                    duration:2500,
+
+                    ease:"Sine.easeIn"
+
+                });
+
+            }
+
+        }else{
+
+            GAME_STATE.stats.mismatches++;
+
+            this.cameras.main.flash(
+                300,
+                255,
+                0,
+                0
+            );
+
+            beep(120,0.2);
+
+            this.add.text(
+
+                centerX,
+
+                620,
+
+                currentQuestion.mismatch,
+
+                {
+                    fontFamily:"Alexandria",
+                    fontSize:"30px",
+                    color:"#ff5252",
+                    align:"center",
+                    wordWrap:{
+                        width:320
+                    }
+                }
+
+            ).setOrigin(0.5);
+
+        }
+
+        this.add.text(
+
+            centerX,
+
+            710,
+
+            dynamicComment(),
+
+            {
+                fontFamily:"Alexandria",
+                fontSize:"18px",
+                color:"#c8c8d8",
+                align:"center",
+                wordWrap:{
+                    width:320
+                }
+            }
+
+        ).setOrigin(0.5);
+
+        createButton(
+
+            this,
+
+            centerX,
+
+            820,
+
+            300,
+
+            76,
+
+            "السؤال التالي",
+
+            0x7c5cff,
+
+            ()=>{
+
+                GAME_STATE.playerAnswers = [null,null];
+
+                GAME_STATE.currentQuestionIndex++;
+
+                if(
+                    GAME_STATE.currentQuestionIndex >=
+                    QUESTION_PACK.length
+                ){
+
+                    GAME_STATE.currentQuestionIndex = 0;
+
+                }
+
+                this.scene.start("QuestionScene");
+
+            }
+
+        );
 
     }
 
 }
+
+function dynamicComment(){
+
+    if(
+        GAME_STATE.stats.matches >
+        GAME_STATE.stats.mismatches
+    ){
+
+        return "واضح إنكم تفكروا بنفس الطريقة 😂";
+
+    }
+
+    if(
+        GAME_STATE.stats.mismatches >
+        GAME_STATE.stats.matches
+    ){
+
+        return "واضح إن الثقة بدأت تنهار 💀";
+
+    }
+
+    return "العلاقة ما زالت تحت الاختبار 👀";
+
+}
+
+/ =====================================================
+    GAME CONFIG
+===================================================== */
 
 const config = {
 
@@ -851,14 +1123,14 @@ const config = {
 
     parent:"game",
 
-    width:window.innerWidth,
+    width:390,
 
-    height:window.innerHeight,
+    height:844,
 
     backgroundColor:"#0f1020",
 
     scale:{
-        mode:Phaser.Scale.RESIZE,
+        mode:Phaser.Scale.FIT,
         autoCenter:Phaser.Scale.CENTER_BOTH
     },
 
@@ -866,8 +1138,7 @@ const config = {
         MainMenu,
         PlayerSetup,
         QuestionScene,
-        RevealScene,
-        Settings
+        RevealScene
     ]
 
 };
@@ -877,4 +1148,5 @@ new Phaser.Game(config);
 </script>
 
 </body>
+
 </html>
